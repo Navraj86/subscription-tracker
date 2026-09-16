@@ -1,197 +1,254 @@
-# Subscription Tracker API
+# 🔔 Subscription Tracker API
 
-A comprehensive Node.js REST API for managing and tracking personal subscriptions with automated renewal reminders.
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-v18+-green?style=for-the-badge&logo=node.js" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express.js-Backend-black?style=for-the-badge&logo=express" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-Mongoose-brightgreen?style=for-the-badge&logo=mongodb" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Security-Arcjet-blueviolet?style=for-the-badge" alt="Arcjet" />
+  <img src="https://img.shields.io/badge/Automation-Upstash%20Workflow-red?style=for-the-badge" alt="Upstash" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" />
+</p>
 
-## Features
+<p align="center">
+  A production-ready, highly secure REST API for managing and tracking recurring subscriptions. Features automated email reminder sequences powered by <strong>Upstash Workflows</strong>, advanced threat defense and rate limiting with <strong>Arcjet</strong>, and robust authentication with <strong>JWT</strong>.
+</p>
 
-- **User Management**: User registration, authentication, and profile management
-- **Subscription Tracking**: Create, read, update, and delete subscriptions
-- **Automated Reminders**: Workflow-based email notifications for upcoming renewals
-- **Security**: JWT authentication, Arcjet protection, and input validation
-- **Database**: MongoDB with Mongoose ODM
-- **Email Integration**: Nodemailer for sending subscription reminders
+---
 
-## Tech Stack
+## 📑 Table of Contents
 
-- **Runtime**: Node.js with ES6 modules
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JSON Web Tokens (JWT)
-- **Security**: Arcjet for rate limiting and protection
-- **Email**: Nodemailer
-- **Workflow**: Upstash Workflow for automated tasks
-- **Password Hashing**: bcryptjs
-- **Development**: ESLint, Nodemon
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Directory Structure](#-directory-structure)
+- [API Endpoints](#-api-endpoints)
+- [Data Models](#-data-models)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Automated Workflow & Reminders](#-automated-workflow--reminders)
+- [Security Features](#-security-features)
+- [License](#-license)
 
-## Project Structure
+---
 
+## ✨ Features
+
+- 🔐 **Secure Authentication:** JWT-based user authentication, password hashing with `bcryptjs`, and route protection middleware.
+- 💳 **Complete Subscription CRUD:** Track monthly/yearly plans, renewal dates, categories, currencies, and cancellation statuses.
+- ⏰ **Automated Renewal Reminders:** Smart email notification workflows scheduled at renewal intervals (e.g., 7 days, 5 days, 2 days, 1 day prior) via Upstash QStash.
+- 🛡️ **Advanced Security (Arcjet):** Built-in rate limiting, bot protection, and email validation to prevent abuse and spam.
+- 📧 **Dynamic Email Templates:** Beautiful, responsive HTML email templates powered by Nodemailer.
+- ⚡ **Centralized Error Handling:** Consistent custom API error handling and validation middleware.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Runtime:** Node.js (ES6+ modules)
+- **Framework:** Express.js
+- **Database:** MongoDB via Mongoose ODM
+- **Workflow & Scheduling:** Upstash Workflow / QStash
+- **Security & Bot Detection:** Arcjet
+- **Authentication:** JSON Web Tokens (JWT) & bcryptjs
+- **Email Delivery:** Nodemailer
+- **Code Quality:** ESLint
+
+---
+
+## 🏗️ System Architecture
+
+```text
+[ Client / Frontend ]
+         │
+         ▼
+[ Express Router ] ──► [ Arcjet Shield & Rate Limiter ]
+         │
+         ▼
+[ Auth Middleware (JWT) ]
+         │
+         ▼
+[ Controllers & Services ] ──────► [ MongoDB Database ]
+         │
+         ▼
+[ Upstash Workflow (QStash) ] ───► [ Nodemailer Service ] ──► [ User Inbox ]
 ```
+
+---
+
+## 📂 Directory Structure
+
+```text
 subscription-tracker/
-├── app.js                          # Main application entry point
-├── package.json                    # Dependencies and scripts
-├── eslint.config.js               # ESLint configuration
+├── app.js                    # Express app entry point & server bootstrap
+├── package.json              # Project dependencies and scripts
+├── eslint.config.js          # ESLint rules and configuration
 ├── config/
-│   ├── env.js                     # Environment variables configuration
-│   ├── arcjet.js                  # Arcjet security configuration
-│   ├── nodemailer.js              # Email service configuration
-│   └── upstash.js                 # Upstash workflow configuration
+│   ├── env.js                # Centralized environment variable loader
+│   ├── arcjet.js             # Arcjet security & rate-limit client setup
+│   ├── nodemailer.js         # SMTP transporter setup
+│   └── upstash.js            # Upstash Workflow / QStash client config
 ├── controllers/
-│   ├── auth.controller.js         # Authentication logic
+│   ├── auth.controller.js    # Sign-up, sign-in, sign-out handlers
 │   ├── subscription.controller.js # Subscription management logic
-│   ├── user.controller.js         # User management logic
-│   └── workflow.controller.js     # Automated workflow logic
+│   ├── user.controller.js    # User profile & administrative logic
+│   └── workflow.controller.js# Upstash reminder step handlers
 ├── database/
-│   └── mongodb.js                 # MongoDB connection setup
+│   └── mongodb.js            # MongoDB connection logic
 ├── middleware/
-│   ├── auth.middleware.js         # JWT authentication middleware
-│   ├── arcjet.middleware.js       # Security middleware
-│   └── error.middleware.js        # Global error handling
+│   ├── auth.middleware.js    # JWT token verification
+│   ├── arcjet.middleware.js  # Security & rate limiting middleware
+│   └── error.middleware.js   # Global error handling middleware
 ├── models/
-│   ├── subscription.model.js      # Subscription data model
-│   └── user.model.js              # User data model
+│   ├── user.model.js         # User schema & validation
+│   └── subscription.model.js # Subscription schema & lifecycle hooks
 ├── routes/
-│   ├── auth.routes.js             # Authentication routes
-│   ├── subscription.routes.js     # Subscription routes
-│   ├── user.routes.js             # User routes
-│   └── workflow.routes.js         # Workflow routes
+│   ├── auth.routes.js        # /api/v1/auth
+│   ├── user.routes.js        # /api/v1/users
+│   ├── subscription.routes.js# /api/v1/subscriptions
+│   └── workflow.routes.js    # /api/v1/workflows
 └── utils/
-    ├── email-template.js          # Email template generator
-    └── send-email.js              # Email sending utility
+    ├── email-template.js     # Responsive HTML email layout
+    └── send-email.js         # Email dispatch helper
 ```
 
-## API Endpoints
+---
 
-### Authentication
-- `POST /api/v1/auth/sign-up` - User registration
-- `POST /api/v1/auth/sign-in` - User login
-- `POST /api/v1/auth/sign-out` - User logout
+## 📡 API Endpoints
 
-### Users
-- `GET /api/v1/users` - Get all users
-- `GET /api/v1/users/:id` - Get user by ID
-- `PUT /api/v1/users/:id` - Update user
-- `DELETE /api/v1/users/:id` - Delete user
+### 1. Authentication (`/api/v1/auth`)
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/api/v1/auth/sign-up` | Register a new user | No |
+| `POST` | `/api/v1/auth/sign-in` | Authenticate user & issue JWT | No |
+| `POST` | `/api/v1/auth/sign-out` | Log out and invalidate token | Yes |
 
-### Subscriptions
-- `GET /api/v1/subscriptions` - Get all subscriptions
-- `GET /api/v1/subscriptions/:id` - Get subscription by ID
-- `POST /api/v1/subscriptions` - Create new subscription
-- `PUT /api/v1/subscriptions/:id` - Update subscription
-- `DELETE /api/v1/subscriptions/:id` - Delete subscription
-- `GET /api/v1/subscriptions/user/:id` - Get user's subscriptions
-- `PUT /api/v1/subscriptions/:id/cancel` - Cancel subscription
+### 2. Users (`/api/v1/users`)
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/v1/users` | List all users | Yes |
+| `GET` | `/api/v1/users/:id` | Get user details by ID | Yes |
+| `PUT` | `/api/v1/users/:id` | Update profile information | Yes |
+| `DELETE` | `/api/v1/users/:id` | Remove user account | Yes |
 
-### Workflows
-- `POST /api/v1/workflows/subscription/reminder` - Send reminder emails
+### 3. Subscriptions (`/api/v1/subscriptions`)
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/v1/subscriptions` | Get all subscriptions | Yes |
+| `POST` | `/api/v1/subscriptions` | Create a new subscription | Yes |
+| `GET` | `/api/v1/subscriptions/:id` | Retrieve subscription details | Yes |
+| `PUT` | `/api/v1/subscriptions/:id` | Update subscription metadata | Yes |
+| `DELETE` | `/api/v1/subscriptions/:id` | Delete a subscription | Yes |
+| `GET` | `/api/v1/subscriptions/user/:id` | Get all subscriptions for a specific user | Yes |
+| `PUT` | `/api/v1/subscriptions/:id/cancel`| Mark subscription as cancelled/inactive | Yes |
 
-## Data Models
+### 4. Workflows (`/api/v1/workflows`)
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/api/v1/workflows/subscription/reminder` | Trigger scheduled reminder sequence | Internal |
 
-### User Model
-- `name` (String, required, 2-50 characters)
-- `email` (String, required, unique, valid email format)
-- `password` (String, required, hashed)
-- `createdAt` (Date, auto-generated)
-- `updatedAt` (Date, auto-generated)
+---
 
-### Subscription Model
-- `name` (String, required, 2-100 characters)
-- `price` (Number, required, minimum 0)
-- `currency` (String, enum: USD, EUR, GBP, default: USD)
-- `frequency` (String, enum: daily, weekly, monthly, yearly)
-- `category` (String, enum: sports, news, entertainment, lifestyle, technology, finance, politics, other)
-- `paymentMethod` (String, required)
-- `status` (String, enum: active, inactive, default: active)
-- `startDate` (Date, required, must be in the past)
-- `renewalDate` (Date, must be after start date)
-- `description` (String, optional)
-- `userId` (ObjectId, reference to User)
-- `createdAt` (Date, auto-generated)
-- `updatedAt` (Date, auto-generated)
+## 📊 Data Models
 
-## Installation
+### User Schema
+| Field | Type | Validation / Options |
+| :--- | :--- | :--- |
+| `name` | `String` | Required, length: 2 - 50 |
+| `email` | `String` | Required, unique, valid email format |
+| `password` | `String` | Required, hashed via bcrypt |
+| `createdAt` | `Date` | Auto-generated timestamp |
+| `updatedAt` | `Date` | Auto-generated timestamp |
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd subscription-tracker
-   ```
+### Subscription Schema
+| Field | Type | Validation / Options |
+| :--- | :--- | :--- |
+| `name` | `String` | Required, length: 2 - 100 |
+| `price` | `Number` | Required, min: `0` |
+| `currency` | `String` | Enum: `['USD', 'EUR', 'GBP']` (Default: `USD`) |
+| `frequency` | `String` | Enum: `['daily', 'weekly', 'monthly', 'yearly']` |
+| `category` | `String` | Enum: `['sports', 'news', 'entertainment', 'lifestyle', 'technology', 'finance', 'politics', 'other']` |
+| `paymentMethod`| `String` | Required |
+| `status` | `String` | Enum: `['active', 'cancelled', 'expired']` (Default: `active`) |
+| `startDate` | `Date` | Required, cannot be future date |
+| `renewalDate` | `Date` | Auto-computed based on frequency |
+| `user` | `ObjectId` | Reference to `User` model |
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+---
 
-3. **Set up environment variables**:
-   Create environment files based on your environment:
-   - `.env.development.local` for development
-   - `.env.production.local` for production
+## ⚙️ Getting Started
 
-   Required environment variables:
-   ```env
-   PORT=3000
-   NODE_ENV=development
-   SERVER_URL=http://localhost:3000
-   
-   # Database
-   DB_URI=mongodb://localhost:27017/subscription-tracker
-   
-   # JWT
-   JWT_SECRET=your-jwt-secret-key
-   JWT_EXPIRES_IN=7d
-   
-   # Arcjet Security
-   ARCJET_ENV=development
-   ARCJET_KEY=your-arcjet-key
-   
-   # Upstash Workflow
-   QSTASH_TOKEN=your-qstash-token
-   QSTASH_URL=your-qstash-url
-   
-   # Email (Nodemailer)
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_USER=your-email@gmail.com
-   EMAIL_PASS=your-app-password
-   ```
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18.x or higher)
+- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas)
+- Accounts for [Upstash](https://upstash.com/) and [Arcjet](https://arcjet.com/)
 
-4. **Start the application**:
-   ```bash
-   # Development mode with auto-reload
-   npm run dev
-   
-   # Production mode
-   npm start
-   ```
+### 1. Clone and Install
+```bash
+git clone https://github.com/Navraj86/subscription-tracker.git
+cd subscription-tracker
+npm install
+```
 
-## Development
+### 2. Configure Environment Variables
+Create your local environment file:
+```bash
+cp .env.example .env.development.local
+```
 
-- **Linting**: Run `npx eslint .` to check code quality
-- **Auto-reload**: Use `npm run dev` for development with automatic restart on file changes
-- **Database**: Ensure MongoDB is running locally or provide a remote connection string
+Fill in the environment variables described below.
 
-## Security Features
+### 3. Run the Application
+```bash
+# Development mode with Nodemon (auto-reload)
+npm run dev
 
-- **JWT Authentication**: Secure user authentication with JSON Web Tokens
-- **Arcjet Protection**: Rate limiting, bot detection, and security monitoring
-- **Input Validation**: Mongoose schema validation for all data inputs
-- **Password Security**: bcryptjs for password hashing
-- **Error Handling**: Comprehensive error middleware for security and debugging
+# Production mode
+npm start
+```
+The server will boot on `http://localhost:3000`.
 
-## Email Notifications
+---
 
-The system includes automated email reminders for subscription renewals:
-- Configurable email templates
-- Workflow-based automation using Upstash
-- Support for multiple email providers via Nodemailer
+## 🔑 Environment Variables
 
-## Contributing
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `PORT` | Server listening port | `3000` |
+| `NODE_ENV` | Runtime environment | `development` / `production` |
+| `SERVER_URL` | Base API URL | `http://localhost:3000` |
+| `DB_URI` | MongoDB connection string | `mongodb+srv://...` |
+| `JWT_SECRET` | Secret key for JWT signing | `your-secret-key` |
+| `JWT_EXPIRES_IN`| Token lifespan | `7d` |
+| `ARCJET_ENV` | Arcjet environment | `development` / `production` |
+| `ARCJET_KEY` | Arcjet project API key | `ajkey_...` |
+| `QSTASH_URL` | Upstash QStash URL | `https://qstash.upstash.io/...` |
+| `QSTASH_TOKEN` | Upstash QStash Token | `ey...` |
+| `EMAIL_HOST` | SMTP server host | `smtp.gmail.com` |
+| `EMAIL_PORT` | SMTP server port | `587` |
+| `EMAIL_USER` | Email account username/address | `you@gmail.com` |
+| `EMAIL_PASS` | Email app password (e.g., Gmail App Password) | `xxxx xxxx xxxx xxxx` |
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
 
-## Support
+## 🔁 Automated Workflow & Reminders
 
-For support and questions, please open an issue in the repository.
+When a user creates a new subscription:
+1. **Renewal Calculation:** The API computes the next `renewalDate` based on `startDate` and `frequency`.
+2. **Workflow Scheduling:** A call is made to the Upstash QStash workflow engine targeting `/api/v1/workflows/subscription/reminder`.
+3. **Smart Delivery:** Upstash pauses and triggers reminder notifications sequentially (e.g. 7 days, 5 days, 2 days, and 1 day before the due date).
+4. **Email Dispatch:** Nodemailer renders personalized HTML templates and delivers the reminder directly to the user's inbox.
+
+---
+
+## 🛡️ Security Features
+
+- **Rate Limiting:** Managed through Arcjet to mitigate brute-force and DDoS attacks.
+- **Bot Protection:** Detects and blocks automated bots and malicious scrapers.
+- **JWT Protection:** Protected endpoints enforce valid bearer tokens.
+- **Input Sanitization:** Mongoose validations prevent malformed or invalid inputs.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
